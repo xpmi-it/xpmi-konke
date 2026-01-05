@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="module_import_tools_category" model="ir.module.category">
+        <field name="name">Xpmi Import Tools</field>
+        <field name="sequence">99</field>
+    </record>
+
+    <record id="import_tools_group_user" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]" />
+        <field name="category_id" ref="xpmi_import.module_import_tools_category" />
+        <field
+            name="users"
+            eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"
+        />
+    </record>
+</odoo>

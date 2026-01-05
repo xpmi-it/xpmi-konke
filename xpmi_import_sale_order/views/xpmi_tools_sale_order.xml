@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- ===================================================== -->
+    <!--                      FORM                             -->
+    <!-- ===================================================== -->
+    <record model="ir.ui.view" id="import_sale_order_form_view">
+        <field name="name">Import Sale Order Form</field>
+        <field name="model">xpmi_tools.sale_order_import</field>
+        <field name="arch" type="xml">
+            <form>
+                <button
+                    name="auto_import_sale_order"
+                    string="Import Sale Order"
+                    type="object"
+                    class="oe_highlight"
+                />
+                <group>
+                    <field name="number" />
+                    <field name="client_order_ref" />
+                    <field name="active" />
+                    <field name="evaso" />
+                    <field name="client_code" />
+                    <field name="invoice_code" />
+                    <field name="delivery_code" />
+                    <!--                        <field name="ragione_sociale"/>-->
+                    <field name="date" />
+                    <field name="date_delivery" />
+                    <field name="product_code" />
+                    <field name="descrizione" />
+                    <field name="qty" />
+                    <field name="prezzo_unitario" />
+                    <field name="sconto" />
+                    <field name="sconto2" />
+                    <field name="sconto3" />
+                    <field name="errore" />
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- ===================================================== -->
+    <!--                      TREE                             -->
+    <!-- ===================================================== -->
+    <record model="ir.ui.view" id="import_sale_order_tree_view">
+        <field name="name">Import Sale Order Tree</field>
+        <field name="model">xpmi_tools.sale_order_import</field>
+        <field name="arch" type="xml">
+            <list string="Import Sale Order">
+                <field name="number" />
+                <field name="client_order_ref" />
+                <field name="product_code" />
+                <field name="descrizione" />
+                <field name="evaso" />
+                <field name="errore" />
+            </list>
+        </field>
+    </record>
+
+    <!-- ===================================================== -->
+    <!--                      SEARCH                           -->
+    <!-- ===================================================== -->
+    <record id="import_stock_search" model="ir.ui.view">
+        <field name="name">Import Sale Order Search</field>
+        <field name="model">xpmi_tools.sale_order_import</field>
+        <field name="arch" type="xml">
+            <search string="Search Agreements">
+                <field name="number" />
+                <field name="client_order_ref" />
+                <field name="active" />
+                <field name="evaso" />
+                <field name="client_code" />
+                <field name="invoice_code" />
+                <field name="delivery_code" />
+                <field name="date" />
+                <field name="date_delivery" />
+                <field name="product_code" />
+                <field name="descrizione" />
+                <field name="qty" />
+                <field name="prezzo_unitario" />
+                <field name="sconto" />
+                <field name="errore" />
+                <separator />
+                <filter
+                    name="inactive"
+                    string="Archived"
+                    domain="[('active', '=', False)]"
+                />
+                <filter name="evaso" string="Evaso" domain="[('evaso', '=', False)]" />
+                <group name="groupby">
+                    <filter
+                        name="evaso_groupby"
+                        string="Evaso"
+                        context="{'group_by': 'evaso'}"
+                    />
+                    <filter
+                        name="errore_groupby"
+                        string="Errore"
+                        context="{'group_by': 'errore'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="xpmi_tools_sale_order_import_action" model="ir.actions.act_window">
+        <field name="name">Import Ordini Clienti</field>
+        <field name="res_model">xpmi_tools.sale_order_import</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        id="import_sale_order_menu"
+        name="Import Ordini Clienti"
+        parent="xpmi_import.menu_tools_import"
+        sequence="3"
+        action="xpmi_tools_sale_order_import_action"
+    />
+</odoo>
