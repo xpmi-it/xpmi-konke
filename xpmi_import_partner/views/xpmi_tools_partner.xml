@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- ===================================================== -->
+    <!--                      FORM                             -->
+    <!-- ===================================================== -->
+    <record id="import_partner_form_view" model="ir.ui.view">
+        <field name="name">Import Partner Form</field>
+        <field name="model">xpmi_tools.partner_import</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="auto_import_partner"
+                        string="Import Partner"
+                        type="object"
+                        class="oe_highlight"
+                    />
+                </header>
+                <div class="alert alert-danger" role="alert" invisible="not error">
+                    <field name="error" widget="text" />
+                </div>
+                <sheet>
+                    <field name="active" invisible="1" />
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        invisible="active"
+                    />
+                    <widget name="web_ribbon" title="Done" invisible="not done" />
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="partner_name" placeholder="Name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="info" string="Info">
+                            <field name="ref" />
+                            <field name="is_company" />
+                            <field name="street" />
+                            <field name="street2" />
+                            <field name="city" />
+                            <field name="zip" />
+                            <field name="state" />
+                            <field name="state_id" />
+                            <field name="country" />
+                            <field name="country_id" />
+                            <field name="phone" />
+                            <field name="mobile" />
+                            <field name="fax" />
+                            <field name="email" />
+                            <field name="pec_mail" />
+                            <field name="website" />
+                            <field name="lang_char" />
+                            <field name="lang" />
+                        </group>
+                        <group name="invoicing" string="Invoicing">
+                            <field name="vat" />
+                            <field name="fiscalcode" />
+                            <field name="codice_destinatario" />
+                            <field name="electronic_invoice_subjected" />
+                            <field name="property_payment_term" />
+                            <field name="property_payment_term_id" />
+                            <field name="property_supplier_payment_term" />
+                            <field name="property_supplier_payment_term_id" />
+                            <field name="property_account_position" />
+                            <field name="property_account_position_id" />
+                            <field name="property_account_payable" />
+                            <field name="property_account_payable_id" />
+                            <field name="property_account_receivable" />
+                            <field name="property_account_receivable_id" />
+                            <field name="bank_name" />
+                            <field name="acc_number" />
+                            <field name="bank_id" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="internal_notes" string="Internal Notes">
+                            <field name="comment" placeholder="Internal notes..." />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ===================================================== -->
+    <!--                      TREE                             -->
+    <!-- ===================================================== -->
+    <record id="import_partner_tree_view" model="ir.ui.view">
+        <field name="name">Import Partner Tree</field>
+        <field name="model">xpmi_tools.partner_import</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="partner_name" />
+                <field name="ref" />
+                <field name="done" />
+                <field name="error" />
+            </list>
+        </field>
+    </record>
+
+    <!-- ===================================================== -->
+    <!--                      SEARCH                           -->
+    <!-- ===================================================== -->
+    <record id="import_partner_search" model="ir.ui.view">
+        <field name="name">Import Partner Search</field>
+        <field name="model">xpmi_tools.partner_import</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_name" />
+                <field name="ref" />
+                <field name="vat" />
+                <field name="fiscalcode" />
+                <field name="street" />
+                <field name="street2" />
+                <field name="city" />
+                <field name="zip" />
+                <field name="state" />
+                <field name="country" />
+                <field name="phone" />
+                <field name="mobile" />
+                <field name="fax" />
+                <field name="email" />
+                <field name="pec_mail" />
+                <field name="codice_destinatario" />
+                <field name="comment" />
+                <field name="website" />
+                <field name="lang_char" />
+                <field name="property_payment_term" />
+                <field name="property_supplier_payment_term" />
+                <field name="property_account_position" />
+                <field name="property_account_payable" />
+                <field name="property_account_receivable" />
+                <field name="bank_name" />
+                <field name="acc_number" />
+                <field name="error" />
+                <separator />
+                <filter
+                    name="inactive"
+                    string="Archived"
+                    domain="[('active', '=', False)]"
+                />
+                <filter name="done" string="Done" domain="[('done', '=', False)]" />
+                <group name="groupby">
+                    <filter
+                        name="done_groupby"
+                        string="Done"
+                        context="{'group_by': 'done'}"
+                    />
+                    <filter
+                        name="error_groupby"
+                        string="Error"
+                        context="{'group_by': 'error'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="xpmi_tools_partner_import_action" model="ir.actions.act_window">
+        <field name="name">Import Partner</field>
+        <field name="path">xpmi-import-partners</field>
+        <field name="res_model">xpmi_tools.partner_import</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        name="Partner Tools"
+        id="menu_partner_import"
+        sequence="4"
+        parent="xpmi_import.menu_tools_import"
+        action="xpmi_tools_partner_import_action"
+    />
+</odoo>
