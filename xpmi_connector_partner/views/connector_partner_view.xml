@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="connector_partner_form_view" model="ir.ui.view">
+        <field name="name">Connector Partner Form</field>
+        <field name="model">connector.partner</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="import_res_partner_manually" string="Import Partner"
+                            context="{'connector_partner_id': False}"
+                            type="object" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="partner_name" placeholder="Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="info" string="Info">
+                            <field name="partner_id"/>
+                            <field name="is_company"/>
+                            <field name="street"/>
+                            <field name="street2"/>
+                            <field name="city"/>
+                            <field name="zip"/>
+                            <field name="state"/>
+                            <field name="state_id"/>
+                            <field name="country"/>
+                            <field name="country_id"/>
+                            <field name="phone"/>
+                            <field name="mobile"/>
+<!--                            <field name="fax"/>-->
+                            <field name="email"/>
+                            <field name="pec_mail"/>
+                            <field name="website"/>
+                            <field name="lang_char"/>
+                            <field name="lang"/>
+                        </group>
+                        <group name="invoicing" string="Invoicing">
+                            <field name="vat"/>
+                            <field name="fiscalcode"/>
+                            <field name="pec_destinatario"/>
+                            <field name="codice_destinatario"/>
+                            <field name="electronic_invoice_subjected"/>
+                            <field name="bank_name"/>
+                            <field name="acc_number"/>
+                            <field name="bank_id"/>
+                        </group>
+                        <group name="status" string="Status">
+                            <field name="active" invisible="1"/>
+                            <field name="done"/>
+                            <field name="error"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="internal_notes" string="Internal Notes">
+                            <field name="comment" placeholder="Internal notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="connector_partner_tree_view" model="ir.ui.view">
+        <field name="name">Connector Partner Tree</field>
+        <field name="model">connector.partner</field>
+        <field name="arch" type="xml">
+            <list string="Import Partner">
+                <field name="partner_name"/>
+                <field name="done"/>
+                <field name="error"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="connector_partner_search" model="ir.ui.view">
+        <field name="name">Connector Partner Search</field>
+        <field name="model">connector.partner</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_name"/>
+                <field name="vat"/>
+                <field name="fiscalcode"/>
+                <field name="street"/>
+                <field name="street2"/>
+                <field name="city"/>
+                <field name="zip"/>
+                <field name="state"/>
+                <field name="country"/>
+                <field name="phone"/>
+                <field name="mobile"/>
+<!--                <field name="fax"/>-->
+                <field name="email"/>
+                <field name="pec_mail"/>
+                <field name="pec_destinatario"/>
+                <field name="codice_destinatario"/>
+                <field name="comment"/>
+                <field name="website"/>
+                <field name="lang_char"/>
+                <field name="bank_name"/>
+                <field name="acc_number"/>
+                <field name="error"/>
+                <separator/>
+                <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
+                <filter name="done" string="Done" domain="[('done', '=', False)]"/>
+                <group name="groupby">
+                    <filter name="done_groupby" string="Done" context="{'group_by': 'done'}"/>
+                    <filter name="error_groupby" string="Error" context="{'group_by': 'error'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="connector_partner_action" model="ir.actions.act_window">
+        <field name="name">Connector Partner</field>
+        <field name="res_model">connector.partner</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem name="Partner"
+              id="menu_connector_partner"
+              sequence="4"
+              parent="da_connector_base.connector_setting_main"
+              action="connector_partner_action"/>
+
+</odoo>

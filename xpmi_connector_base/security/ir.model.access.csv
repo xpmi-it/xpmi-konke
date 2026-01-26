@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_connector_setting_manager,connector_setting manager,model_connector_setting,group_connector_master,1,1,1,1
+access_connector_setting_user,connector_setting user,model_connector_setting,group_connector_user,1,0,0,0
+
+access_connector_mapping_manager,connector_mapping manager,model_connector_mapping,group_connector_master,1,1,1,1
+access_connector_mapping_user,connector_mapping user,model_connector_mapping,group_connector_user,1,0,0,0

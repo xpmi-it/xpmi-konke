@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--Form-->
+    <record model="ir.ui.view" id="connector_mapping_form_view">
+        <field name="name">connector.mapping.form.view</field>
+        <field name="model">connector.mapping</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="marketplace"/>
+                        <field name="field_type"/>
+                        <field name="marketplace_value"/>
+                        <field name="odoo_value"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--Tree-->
+    <record model="ir.ui.view" id="connector_mapping_tree_view">
+        <field name="name">connector.mapping.tree.view</field>
+        <field name="model">connector.mapping</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="marketplace"/>
+                <field name="field_type"/>
+                <field name="marketplace_value"/>
+                <field name="odoo_value"/>
+            </list>
+        </field>
+    </record>
+
+    <!--Search-->
+    <record model="ir.ui.view" id="connector_mapping_search_view">
+        <field name="name">connector.mapping.search.view</field>
+        <field name="model">connector.mapping</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="marketplace"/>
+                <field name="field_type"/>
+                <field name="marketplace_value"/>
+                <field name="odoo_value"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_connector_mapping" model="ir.actions.act_window">
+        <field name="name">Mapping</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">connector.mapping</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="connector_mapping" name="Mapping" parent="connector_setting_main"
+              action="action_connector_mapping" sequence="3"
+              groups="group_connector_master,group_connector_user"/>
+
+</odoo>
