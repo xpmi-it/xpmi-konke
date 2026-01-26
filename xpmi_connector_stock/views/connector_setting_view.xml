@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="ir.ui.view" id="connector_setting_form_view_inherit">
+        <field name="name">connector.setting.form.view.inherit</field>
+        <field name="model">connector.setting</field>
+        <field name="inherit_id" ref="da_connector_base.connector_setting_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/notebook/page[@name='pricelist_setting']" position="after">
+                <page string="Stock Setting" name="stock_setting">
+                    <group>
+                        <field name="exclude_location_ids" widget="many2many_tags"/>
+                        <field name="type_calculation"/>
+                        <field name="send_stock"/>
+                        <field name="stock_file_name" invisible="send_stock != 'sftp'"/>
+                        <field name="stock_file" filename="stock_file_name"/>
+                        <field name="stock_user_sftp" invisible="send_stock != 'sftp'"/>
+                        <field name="stock_pwd_sftp" password="True" invisible="send_stock != 'sftp'"/>
+                        <field name="stock_port_sftp" invisible="send_stock != 'sftp'"/>
+                        <field name="stock_ip_sftp" invisible="send_stock != 'sftp'"/>
+                        <field name="stock_file_path_sftp" invisible="send_stock != 'sftp'"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

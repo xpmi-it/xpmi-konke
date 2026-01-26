@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="ir.ui.view" id="connector_setting_form_view_inherit">
+        <field name="name">connector.setting.form.view.inherit</field>
+        <field name="model">connector.setting</field>
+        <field name="inherit_id" ref="da_connector_base.connector_setting_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/notebook/page[@name='pricelist_setting']" position="after">
+                <page string="Order Setting" name="order_setting">
+                    <group>
+                        <field name="import_order"/>
+                        <field name="order_status_to_import" invisible="not import_order"/>
+                        <field name="automatic_confirm_sale_order" invisible="not import_order"/>
+                        <field name="carrier_id" invisible="not import_order"/>
+                        <field name="get_tax_from_product" invisible="not import_order"/>
+                        <field name="use_odoo_sequence" invisible="not import_order"/>
+                        <field name="order_prefix" invisible="not import_order or use_odoo_sequence"/>
+                        <field name="url_import_order" invisible="not import_order" required="import_order"/>
+                        <field name="url_carrier_info"/>
+                        <field name="range_import_order" invisible="not import_order"/>
+                        <field name="limit_for_call" invisible="not import_order"/>
+                        <field name="payment_term_id" invisible="not import_order"/>
+                        <field name="fiscal_position_id" invisible="not import_order"/>
+                        <field name="fiscal_position_b2b_id" invisible="not import_order"/>
+                        <field name="discount_product_id" invisible="not import_order"/>
+                        <field name="sale_order_type_b2b_id" invisible="not import_order"/>
+                        <field name="sale_order_type_b2c_id" invisible="not import_order"/>
+                    </group>
+                </page>
+                <page string="Carrier Lines" name="carrier_lines">
+                    <group>
+                        <field name="connector_carrier_line_ids">
+                            <list>
+                                <field name="connector_id" invisible="1"/>
+                                <field name="carrier_code"/>
+                                <field name="carrier_name"/>
+                                <field name="standard_code"/>
+                                <field name="tracking_url"/>
+                            </list>
+                        </field>
+                    </group>
+                </page>
+
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

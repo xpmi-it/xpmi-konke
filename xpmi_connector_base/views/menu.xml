@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+        <!--Root menu-->
+        <menuitem id="connector_root" name="Connector" sequence="1"
+                  groups="group_connector_master,group_connector_user"/>
+
+        <!--Customers menu-->
+        <menuitem id="connector_main" name="Connector" parent="connector_root" sequence="1"
+                  groups="group_connector_master,group_connector_user"/>
+
+<!--        &lt;!&ndash;Orders menu&ndash;&gt;-->
+<!--        <menuitem id="orders_main" name="Orders" parent="manomano_root" sequence="5"-->
+<!--                  groups="group_mano_mano_master,group_mano_mano_user"/>-->
+
+<!--        <record id="action_mm_order" model="ir.actions.act_window">-->
+<!--            <field name="name">MM Orders</field>-->
+<!--            <field name="type">ir.actions.act_window</field>-->
+<!--            <field name="res_model">mm.order</field>-->
+<!--            <field name="view_mode">list,form</field>-->
+<!--        </record>-->
+
+<!--        <menuitem id="mm_order" name="MM Orders" parent="orders_main" action="action_mm_order" sequence="6"-->
+<!--                  groups="group_mano_mano_master,group_mano_mano_user"/>-->
+
+<!--        <record id="action_mm_order_line" model="ir.actions.act_window">-->
+<!--            <field name="name">MM Orders Lines</field>-->
+<!--            <field name="type">ir.actions.act_window</field>-->
+<!--            <field name="res_model">mm.order.line</field>-->
+<!--            <field name="view_mode">list,form</field>-->
+<!--        </record>-->
+
+<!--        <menuitem id="mm_order_line" name="MM Orders Lines" parent="orders_main" action="action_mm_order_line"-->
+<!--                  sequence="7" groups="group_mano_mano_master,group_mano_mano_user"/>-->
+
+        <!--Setting menu-->
+        <menuitem id="connector_setting_main" name="Setting" parent="connector_root" sequence="8"
+                  groups="group_connector_master,group_connector_user"/>
+
+        <record id="action_connector_setting" model="ir.actions.act_window">
+            <field name="name">Connector Setting</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">connector.setting</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <menuitem id="connector_setting" name="Setting" parent="connector_setting_main"
+                  action="action_connector_setting" sequence="9"
+                  groups="group_connector_master,group_connector_user"/>
+
+</odoo>

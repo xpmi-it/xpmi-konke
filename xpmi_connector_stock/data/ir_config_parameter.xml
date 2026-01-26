@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<odoo>
+    <data noupdate="1">
+        <record id="day_for_long_forecast_qty" model="ir.config_parameter">
+            <field name="key">day.for.long_forecast_qty</field>
+            <field name="value" eval="'7'"/>
+        </record>
+    </data>
+
+</odoo>

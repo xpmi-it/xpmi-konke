@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_connector_partner_manager,connector_partner manager,model_connector_partner,da_connector_base.group_connector_master,1,1,1,1
+access_connector_partner_user,connector_partner user,model_connector_partner,da_connector_base.group_connector_user,1,0,0,0

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="ir.ui.view" id="product_customerinfo_mapping_mirakl_form_view">
+        <field name="name">product.customerinfo.mapping.form.view</field>
+        <field name="model">product.customerinfo</field>
+        <field name="inherit_id" ref="da_connector_mapping_product.product_customerinfo_mapping_form_view"/>
+        <field name="arch" type="xml">
+            <field name="external_sku" position="after">
+                <field name="marketplace" invisible="1"/>
+                <field name="mirakl_product_id" invisible="marketplace != 'mirakl'"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>

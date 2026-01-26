@@ -1,0 +1,1 @@
+With this module you can map product with external Sku for single connector setting.

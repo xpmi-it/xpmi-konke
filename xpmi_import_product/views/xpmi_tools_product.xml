@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- ===================================================== -->
+    <!--                      FORM                             -->
+    <!-- ===================================================== -->
+    <record id="import_product_form_view" model="ir.ui.view">
+        <field name="name">Import Product Form</field>
+        <field name="model">xpmi_tools.product_import</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="auto_import_product"
+                        string="Import Product"
+                        type="object"
+                        class="oe_highlight"
+                    />
+                </header>
+                <div class="alert alert-danger" role="alert" invisible="not error">
+                    <field name="error" widget="text" />
+                </div>
+                <sheet>
+                    <field name="active" invisible="1" />
+                    <widget
+                        name="web_ribbon"
+                        title="Archived"
+                        bg_color="bg-danger"
+                        invisible="active"
+                    />
+                    <widget name="web_ribbon" title="Done" invisible="not done" />
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="info" string="Info">
+                            <field name="detailed_type" />
+                            <field name="product_default_code" />
+                            <field name="barcode" />
+                            <field name="categ" />
+                            <field name="categ_id" />
+                            <field name="list_price" />
+                            <field name="taxes" />
+                            <field name="taxes_id" />
+                            <field name="uom" />
+                            <field name="uom_id" />
+                            <field name="uom_po" />
+                            <field name="uom_po_id" />
+                        </group>
+                        <group name="supplier" string="Supplier">
+                            <field name="supplier_ref" />
+                            <field name="partner_id" />
+                            <field name="supplier_product_name" />
+                            <field name="supplier_product_code" />
+                            <field name="supplier_price" />
+                            <field name="supplier_delay" />
+                            <field name="supplier_taxes" />
+                            <field name="supplier_taxes_id" />
+                        </group>
+                        <group name="invoicing" string="Invoicing">
+                            <field name="property_account_income" />
+                            <field name="property_account_income_id" />
+                            <field name="property_account_expense" />
+                            <field name="property_account_expense_id" />
+                        </group>
+                        <group name="stock" string="Stock">
+                            <field name="weight" />
+                            <field name="volume" />
+                            <field name="tracking" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="internal_notes" string="Internal Notes">
+                            <field name="description" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ===================================================== -->
+    <!--                      TREE                             -->
+    <!-- ===================================================== -->
+    <record id="import_product_tree_view" model="ir.ui.view">
+        <field name="name">Import Product Tree</field>
+        <field name="model">xpmi_tools.product_import</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="supplier_product_name" />
+                <field name="supplier_product_code" />
+                <field name="done" />
+                <field name="error" />
+            </list>
+        </field>
+    </record>
+
+    <!-- ===================================================== -->
+    <!--                      SEARCH                           -->
+    <!-- ===================================================== -->
+    <record id="import_product_search" model="ir.ui.view">
+        <field name="name">Import Product Search</field>
+        <field name="model">xpmi_tools.product_import</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="product_default_code" />
+                <field name="list_price" />
+                <field name="supplier_ref" />
+                <field name="supplier_product_code" />
+                <field name="supplier_product_name" />
+                <field name="supplier_price" />
+                <field name="supplier_delay" />
+                <field name="weight" />
+                <field name="volume" />
+                <field name="barcode" />
+                <field name="property_account_income" />
+                <field name="property_account_expense" />
+                <field name="taxes" />
+                <field name="supplier_taxes" />
+                <field name="categ" />
+                <field name="uom" />
+                <field name="description" />
+                <field name="tracking" />
+                <field name="detailed_type" />
+                <separator />
+                <filter
+                    name="inactive"
+                    string="Archived"
+                    domain="[('active', '=', False)]"
+                />
+                <filter name="done" string="Done" domain="[('done', '=', False)]" />
+                <group name="groupby">
+                    <filter
+                        name="done_groupby"
+                        string="Done"
+                        context="{'group_by': 'done'}"
+                    />
+                    <filter
+                        name="error_groupby"
+                        string="Error"
+                        context="{'group_by': 'error'}"
+                    />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="xpmi_tools_product_import_action" model="ir.actions.act_window">
+        <field name="name">Import Product</field>
+        <field name="path">xpmi-import-products</field>
+        <field name="res_model">xpmi_tools.product_import</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem
+        name="Product Tools"
+        id="menu_product_import"
+        sequence="3"
+        parent="xpmi_import.menu_tools_import"
+        action="xpmi_tools_product_import_action"
+    />
+</odoo>
