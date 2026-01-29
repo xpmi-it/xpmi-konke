@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="konke_clean_mail_notification_layout"
+              inherit_id="mail.mail_notification_layout"
+              name="Konke Clean - Mail Notification Layout (Company Flag)">
+
+        <!-- Header area (document title + action button) -->
+        <xpath expr="//div[@summary='o_mail_notification']"
+               position="attributes">
+            <attribute name="t-if">
+                (show_header and (subtitles or has_button_access or not is_discussion))
+                and (not company or not company.hide_email_layout_parts)
+            </attribute>
+        </xpath>
+
+        <!-- Footer: company info container (keep company name visible) -->
+        <xpath expr="//div[@t-if='show_footer'][.//b[@t-out='company.name']]"
+               position="attributes">
+            <attribute name="t-if">show_footer</attribute>
+        </xpath>
+
+        <!-- Footer: contact line (phone/email/website) -->
+        <xpath expr="//div[@t-if='show_footer'][.//b[@t-out='company.name']]/p"
+               position="attributes">
+            <attribute name="t-if">
+                not company or not company.hide_email_layout_parts
+            </attribute>
+        </xpath>
+
+        <!-- Footer: powered by / unfollow -->
+        <xpath expr="//div[@t-if='show_footer'][.//span[@id='mail_unfollow']]"
+               position="attributes">
+            <attribute name="t-if">
+                show_footer and (not company or not company.hide_email_layout_parts)
+            </attribute>
+        </xpath>
+
+    </template>
+
+    <template id="konke_clean_mail_notification_light"
+              inherit_id="mail.mail_notification_light"
+              name="Konke Clean - Mail Notification Light Layout (Company Flag)">
+
+        <!-- Header text block (keep logo) -->
+        <xpath expr="//tbody/tr[1]/td[1]/table/tr[1]/td[1]"
+               position="attributes">
+            <attribute name="t-if">
+                not company or not company.hide_email_layout_parts
+            </attribute>
+        </xpath>
+
+        <!-- Footer: contact line (phone/email/website) -->
+        <xpath expr="//tbody/tr[.//b[@t-out='company.name']]/td/div"
+               position="attributes">
+            <attribute name="t-if">
+                not company or not company.hide_email_layout_parts
+            </attribute>
+        </xpath>
+
+        <!-- Powered by / Unfollow -->
+        <xpath expr="//tr[.//span[@id='mail_unfollow']]"
+               position="attributes">
+            <attribute name="t-if">
+                not company or not company.hide_email_layout_parts
+            </attribute>
+        </xpath>
+
+    </template>
+
+</odoo>

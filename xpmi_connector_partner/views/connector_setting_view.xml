@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="ir.ui.view" id="connector_setting_regex_form_view_inherit">
+        <field name="name">connector.setting.regex.form.view.inherit</field>
+        <field name="model">connector.setting</field>
+        <field name="inherit_id" ref="da_connector_base.connector_setting_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/notebook/page[@name='pricelist_setting']" position="after">
+                <page name="regex_check" string="Regex Business Order Check">
+                    <group>
+                        <field name="regex_vat" />
+                        <field name="regex_fiscalcode" />
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
