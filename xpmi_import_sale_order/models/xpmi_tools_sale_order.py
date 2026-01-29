@@ -44,6 +44,12 @@ class DaToolsSaleOrder(models.Model):
     sconto = fields.Float(string="Sconto 1 %")
     sconto2 = fields.Float(string="Sconto 2 %")
     sconto3 = fields.Float(string="Sconto 3 %")
+    company = fields.Char(string="Company")
+    company_id = fields.Many2one("res.company", string="Company ID")
+    team = fields.Char(string="Team")
+    team_id = fields.Many2one('crm.team', 'Sales Team')
+    carrier = fields.Char(string="Carrier")
+    carrier_id = fields.Many2one('delivery.carrier', string="Delivery")
 
     def _search_partner(self, ref_code):
         if not ref_code:
@@ -115,14 +121,16 @@ class DaToolsSaleOrder(models.Model):
             key_number = import_data.get_key_number()
             import_data.number = number_dict[key_number]
 
-    def _prepare_order_vals(self, partner, ship_partner, inv_partner):
+    def _prepare_order_vals(self, partner, ship_partner, inv_partner, company):
         vals = {
             "name": self.number,
             "client_order_ref": self.client_order_ref,
             "partner_id": partner.id,
             "partner_shipping_id": ship_partner.id,
             "partner_invoice_id": inv_partner.id,
-            "company_id": self.env.company.id,
+            "company_id": company.id,
+            "team_id": company.id,
+            "carrier_id": company.id,
             "state": "draft",
         }
         if self.date:
@@ -168,6 +176,8 @@ class DaToolsSaleOrder(models.Model):
         prod_codes = imports_datas.mapped("product_code")
         prods = self.env["product.product"].search([("default_code", "in", prod_codes)])
         prod_map = {p.default_code: p for p in prods}
+
+        company = import_data._search_company()
 
         self.auto_set_number()
 
@@ -235,3 +245,19 @@ class DaToolsSaleOrder(models.Model):
             import_data.evaso = True
 
         return True
+
+    def _search_company(self):
+        self.ensure_one()
+        if self.company_id:
+            return self.company_id
+        self.company = self.company.strip()
+        company_domain = [("name", "=ilike", self.company)]
+        company = self.env["res.company"].sudo().search(company_domain, limit=1)
+        if company:
+            return company.id
+
+        import_domains = [("company", "=", self.company), ("company_id", "!=", False)]
+        import_data = self.sudo().search(import_domains, limit=1)
+        if import_data and import_data.company_id:
+                return import_data.company_id
+        return False

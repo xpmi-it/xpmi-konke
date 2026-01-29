@@ -18,6 +18,7 @@
         "product",
         "xpmi_import",
         "stock",
+        "product_brand",
     ],
     "data": [
         "security/ir.model.access.csv",

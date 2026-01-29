@@ -70,6 +70,10 @@ class XpmiToolsProductImport(models.Model):
     uom_id = fields.Many2one("uom.uom", string="Unit of Measure ID")
     uom_po = fields.Char(string="Purchase UoM")
     uom_po_id = fields.Many2one("uom.uom", string="Purchase UoM ID")
+    brand = fields.Char(string="Brand")
+    brand_id = fields.Many2one("product.brand", string="Brand ID")
+    company = fields.Char(string="Company")
+    company_id = fields.Many2one("res.company", string="Company ID")
     active = fields.Boolean(default=True)
     done = fields.Boolean(default=False)
     error = fields.Char()
@@ -84,16 +88,26 @@ class XpmiToolsProductImport(models.Model):
 
         return True
 
-    def _search_product(self):
+    def _search_product(self, company):
         self.ensure_one()
 
         product_id = self.env["product.product"]
         if self.product_default_code:
-            domain = [("default_code", "=", self.product_default_code)]
-            product_id = self.env["product.product"].search(domain, limit=1)
+            product_domain = [
+                ('default_code', '=', self.product_default_code),
+                '|',
+                ('company_id', '=', company.id),
+                ('company_id', '=', False)
+            ]
+            product_id = self.env["product.product"].sudo().search(product_domain, limit=1)
         if not product_id and self.barcode:
-            domain = [("barcode", "=", self.barcode)]
-            product_id = self.env["product.product"].search(domain, limit=1)
+            product_domain = [
+                ('barcode', '=', self.barcode),
+                '|',
+                ('company_id', '=', company.id),
+                ('company_id', '=', False)
+            ]
+            product_id = self.env["product.product"].sudo().search(product_domain, limit=1)
         return product_id
 
     def _default_data(self):
@@ -113,15 +127,22 @@ class XpmiToolsProductImport(models.Model):
             "uom_po_id": (
                 self.uom_po_id if self.uom_po_id else self.uom_id or self.env["uom.uom"]
             ),
+            # "brand_id": self.brand_id or self.env["product.brand"],
+            "company_id": self.company_id or self.env["res.company"],
+
         }
         return data
 
-    def _search_property_account_income(self):
+    def _search_property_account_income(self, company):
         self.ensure_one()
 
         domain = [
             ("code", "=", self.property_account_income),
+            '|',
+            ('company_id', '=', company.id),
+            ('company_id', '=', False)
         ]
+
         property_account_income_id = self.env["account.account"].search(domain, limit=1)
         if property_account_income_id:
             return property_account_income_id
@@ -129,6 +150,7 @@ class XpmiToolsProductImport(models.Model):
         domain = [
             ("property_account_income", "=", self.property_account_income),
             ("property_account_income_id", "!=", False),
+            ("company_id", "=", company.id),
         ]
         import_data = self.search(domain, limit=1)
         return (
@@ -137,11 +159,14 @@ class XpmiToolsProductImport(models.Model):
             else False
         )
 
-    def _search_property_account_expense(self):
+    def _search_property_account_expense(self, company):
         self.ensure_one()
 
         domain = [
             ("code", "=", self.property_account_expense),
+            '|',
+            ('company_id', '=', company.id),
+            ('company_id', '=', False)
         ]
         property_account_expense_id = self.env["account.account"].search(
             domain, limit=1
@@ -152,6 +177,7 @@ class XpmiToolsProductImport(models.Model):
         domain = [
             ("property_account_expense", "=", self.property_account_expense),
             ("property_account_expense_id", "!=", False),
+            ("company_id", "=", company.id),
         ]
         import_data = self.search(domain, limit=1)
         return (
@@ -160,17 +186,18 @@ class XpmiToolsProductImport(models.Model):
             else False
         )
 
-    def _search_taxes(self):
+    def _search_taxes(self, company):
         self.ensure_one()
 
         domain = [
             ("taxes", "=", self.taxes),
             ("taxes_id", "!=", False),
+            ("company_id", "=", company.id),
         ]
         import_data = self.search(domain, limit=1)
         return import_data.taxes_id if import_data.taxes_id else False
 
-    def _search_supplier_taxes(self):
+    def _search_supplier_taxes(self, company):
         self.ensure_one()
 
         domains = [
@@ -178,7 +205,8 @@ class XpmiToolsProductImport(models.Model):
                 ("supplier_taxes", "=", self.supplier_taxes),
                 ("supplier_taxes_id", "!=", False),
             ],
-            [("taxes", "=", self.supplier_taxes), ("supplier_taxes_id", "!=", False)],
+            [("taxes", "=", self.supplier_taxes), ("supplier_taxes_id", "!=", False),
+             ("company_id", "=", company.id),],
         ]
         for domain in domains:
             import_data = self.search(domain, limit=1)
@@ -236,27 +264,67 @@ class XpmiToolsProductImport(models.Model):
 
         return False
 
+    def _search_brand(self):
+        self.ensure_one()
+
+        domain = [("name", "=ilike", self.brand)]
+        brand_id = self.env["product.brand"].search(domain, limit=1)
+        if brand_id:
+            return brand_id
+
+        domains = [("brand", "=", self.brand), ("brand_id", "!=", False)]
+        import_data = self.search(domain, limit=1)
+        if import_data and import_data.brand_id:
+                return import_data.brand_id
+
+        return False
+
+    def _search_company(self):
+        self.ensure_one()
+        if self.company_id:
+            return self.company_id
+        self.company = self.company.strip()
+        company_domain = [("name", "=ilike", self.company)]
+        company = self.env["res.company"].sudo().search(company_domain, limit=1)
+        if company:
+            return company.id
+
+        import_domains = [("company", "=", self.company), ("company_id", "!=", False)]
+        import_data = self.sudo().search(import_domains, limit=1)
+        if import_data and import_data.company_id:
+                return import_data.company_id
+        return False
+
+
+
     def _compute_data(self):
         # flake8: noqa: C901
         self.ensure_one()
         data = self._default_data()
 
+        if not data["company_id"] and self.company:
+            data["company_id"] = self._search_company()
+        if not data["company_id"]:
+            self.error = _("Company Not Found")
+            return False
+        copmany = data["company_id"]
+        print(copmany)
         if not data["property_account_income_id"]:
-            data["property_account_income_id"] = self._search_property_account_income()
+            data["property_account_income_id"] = self._search_property_account_income(company)
         if not data["property_account_income_id"]:
             self.error = _("Income Account Not Found")
             return False
 
         if not data["property_account_expense_id"]:
             data["property_account_expense_id"] = (
-                self._search_property_account_expense()
+                self._search_property_account_expense(company)
             )
         if not data["property_account_expense_id"]:
             self.error = _("Expense Account Not Found")
             return False
 
         if not data["taxes_id"] and self.taxes:
-            data["taxes_id"] = self._search_taxes()
+            data["taxes_id"] = self._search_taxes(company)
         if not data["taxes_id"]:
             self.error = _("Customer Taxes Not Found")
             return False
@@ -264,7 +332,7 @@ class XpmiToolsProductImport(models.Model):
         if not self.supplier_taxes:
             self.supplier_taxes = self.taxes
         if not data["supplier_taxes_id"] and self.supplier_taxes:
-            data["supplier_taxes_id"] = self._search_supplier_taxes()
+            data["supplier_taxes_id"] = self._search_supplier_taxes(company)
         if not data["supplier_taxes_id"]:
             self.error = _("Vendor Taxes Not Found")
             return False
@@ -288,6 +356,17 @@ class XpmiToolsProductImport(models.Model):
         if not data["uom_po_id"]:
             self.error = _("Purchase UoM Not Found")
             return False
+
+        # if not data["brand_id"] and self.brand:
+        #     data["brand_id"] = self._search_brand()
+        # if not data["brand_id"]:
+        #     self.error = _("Unit of Measure Not Found")
+        #     return False
+
+
+
+
+
 
         return data
 
@@ -354,17 +433,30 @@ class XpmiToolsProductImport(models.Model):
             elif data["uom_id"]:
                 product_data["uom_po_id"] = data["uom_id"].id
 
+        # if data["brand_id"] and not product_id.brand_id:
+        #     product_data["brand_id"] = data["brand_id"].id
+        if data["company_id"] and not product_id.company_id:
+            product_data["company_id"] = data["company_id"].id
+
         return product_data
 
     def _search_supplier(self):
         self.ensure_one()
 
-        domain = [("ref", "=", self.supplier_ref)]
+        domain = [("ref", "=", self.supplier_ref),
+                  '|',
+                  ('company_id', '=', company.id),
+                  ('company_id', '=', False)
+                  ]
         partner_id = self.env["res.partner"].search(domain, limit=1)
         if partner_id:
             return partner_id
 
-        domain = [("ref", "ilike", self.supplier_ref)]
+        domain = [("ref", "ilike", self.supplier_ref),
+                  '|',
+                  ('company_id', '=', company.id),
+                  ('company_id', '=', False)
+                  ]
         partner_id = self.env["res.partner"].search(domain, limit=1)
         if partner_id:
             partner_ref = partner_id.ref or ""
@@ -427,9 +519,14 @@ class XpmiToolsProductImport(models.Model):
         for import_data in imports_datas:
             if not import_data._check_consistency():
                 continue
-
+            # searc company
+            company = import_data._search_company()
+            if not company:
+                import_data.error = _("Company missing")
+                continue
+            print(company)
             # search product
-            product_id = import_data._search_product()
+            product_id = import_data._search_product(company)
             if len(product_id) != 1 and product_id:
                 import_data.error = _("There are many partner with same data")
                 continue
@@ -445,13 +542,16 @@ class XpmiToolsProductImport(models.Model):
             if not product_id:
                 product_data["name"] = import_data.name
                 try:
-                    product_id = self.env["product.product"].create([product_data])
+                    product_id = self.env["product.product"].sudo().create([product_data])
+                    import_data.update_template_product(product_id)
+
                 except Exception as error:
                     import_data.error = str(error)
                     continue
             else:
                 try:
-                    product_id.write(product_data)
+                    product_id.sudo().write(product_data)
+                    import_data.update_template_product(product_id)
                 except Exception as error:
                     import_data.error = str(error)
                     continue
@@ -462,3 +562,11 @@ class XpmiToolsProductImport(models.Model):
 
             import_data.done = True
             self.env.cr.commit()  # pylint: disable=E8102
+
+    def update_template_product(self, product_id):
+        template = product_id.product_tmpl_id
+        if self.brand:
+            brand = self._search_brand()
+            template.write({
+                'product_brand_id': brand,
+            })

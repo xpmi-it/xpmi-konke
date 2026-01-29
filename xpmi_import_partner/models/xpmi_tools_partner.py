@@ -68,6 +68,9 @@ class XpmiToolsPartnerImport(models.Model):
     active = fields.Boolean(default=True)
     done = fields.Boolean(default=False)
     error = fields.Char()
+    company = fields.Char(string="Company")
+    company_id = fields.Many2one("res.company", string="Company ID")
+
 
     @api.model
     def _skip_compute_state(self):
@@ -86,15 +89,32 @@ class XpmiToolsPartnerImport(models.Model):
             return False
         return True
 
-    def _search_partner(self):
+    def _search_partner(self, company):
         self.ensure_one()
-
-        partner_id = self.env["res.partner"]
+        partner = self.env["res.partner"]
         if self.ref:
-            partner_id = self.env["res.partner"].search([("ref", "=", self.ref)])
-        if not partner_id and self.vat and self.vat != "0":
-            partner_id = self.env["res.partner"].search([("vat", "=", self.vat)])
-        return partner_id
+            partner_domain = [("ref", "=", self.ref), ("company_id", "=", company.id)]
+            partner = self.env["res.partner"].sudo().search(partner_domain)
+        if not partner and self.vat and self.vat != "0":
+            partner_domain = [("vat", "=", self.vat), ("company_id", "=", company.id)]
+            partner = self.env["res.partner"].sudo().search(partner_domain)
+        return partner
+
+    def _search_company(self):
+        self.ensure_one()
+        if self.company_id:
+            return self.company_id
+        self.company = self.company.strip()
+        company_domain = [("name", "=ilike", self.company)]
+        company = self.env["res.company"].sudo().search(company_domain, limit=1)
+        if company:
+            return company.id
+
+        import_domains = [("company", "=", self.company), ("company_id", "!=", False)]
+        import_data = self.sudo().search(import_domains, limit=1)
+        if import_data and import_data.company_id:
+                return import_data.company_id
+        return False
 
     def _default_data(self):
         self.ensure_one()
@@ -103,21 +123,21 @@ class XpmiToolsPartnerImport(models.Model):
             "state_id": self.state_id or self.env["res.country.state"],
             "country_id": self.country_id or self.env["res.country"],
             "property_payment_term_id": (
-                self.property_payment_term_id or self.env["account.payment.term"]
+                self.property_payment_term_id or self.env["account.payment.term"] #company
             ),
             "property_supplier_payment_term_id": (
                 self.property_supplier_payment_term_id
                 or self.env["account.payment.term"]
             ),
             "property_account_position_id": (
-                self.property_account_position_id or self.env["account.fiscal.position"]
+                self.property_account_position_id or self.env["account.fiscal.position"]#company
             ),
             "bank_id": self.bank_id or self.env["res.bank"],
             "property_account_receivable_id": (
-                self.property_account_receivable_id or self.env["account.account"]
+                self.property_account_receivable_id or self.env["account.account"]#company_ids
             ),
             "property_account_payable_id": (
-                self.property_account_payable_id or self.env["account.account"]
+                self.property_account_payable_id or self.env["account.account"]#company_ids
             ),
             "lang": self.lang,
         }
@@ -156,19 +176,23 @@ class XpmiToolsPartnerImport(models.Model):
         import_data = self.search(domain, limit=1)
         return import_data.state_id if import_data.state_id else False
 
-    def _search_property_payment_term(self):
+    def _search_property_payment_term(self, company):
         self.ensure_one()
 
-        domain = [("name", "=", self.property_payment_term)]
-        property_payment_term_id = self.env["account.payment.term"].search(
+        domain = [("name", "=", self.property_payment_term),
+                  "|",
+                  ("company_id", "=", company.id),
+                  ("company_id", "=", False)]
+        property_payment_term_id = self.env["account.payment.term"].sudo().search(
             domain, limit=1
-        )
+        )#company
         if property_payment_term_id:
             return property_payment_term_id
 
         domain = [
             ("property_payment_term", "=", self.property_payment_term),
             ("property_payment_term_id", "!=", False),
+            ("company", "=", self.company)
         ]
         import_data = self.search(domain, limit=1)
         return (
@@ -177,20 +201,24 @@ class XpmiToolsPartnerImport(models.Model):
             else False
         )
 
-    def _search_property_supplier_payment_term(self):
+    def _search_property_supplier_payment_term(self, company):
         self.ensure_one()
         supplier_payment_term = self.property_supplier_payment_term
 
-        domain = [("name", "=", supplier_payment_term)]
-        property_supplier_payment_term_id = self.env["account.payment.term"].search(
+        domain = [("name", "=", supplier_payment_term),
+                  "|",
+                  ("company_id", "=", company.id),
+                  ("company_id", "=", False)]
+        property_supplier_payment_term_id = self.env["account.payment.term"].sudo().search(
             domain, limit=1
-        )
+        )#company
         if property_supplier_payment_term_id:
             return property_supplier_payment_term_id
 
         domain = [
             ("property_supplier_payment_term", "=", supplier_payment_term),
             ("property_supplier_payment_term_id", "!=", False),
+            ("company", "=", self.company)
         ]
         import_data = self.search(domain, limit=1)
         return (
@@ -200,13 +228,14 @@ class XpmiToolsPartnerImport(models.Model):
         )
 
     def _search_property_account_payable(self):
+        # conto corrente bancario
         self.ensure_one()
         account_payable = self.property_account_payable
 
         domain = ["|", ("code", "=", account_payable), ("name", "=", account_payable)]
-        property_account_payable_id = self.env["account.account"].search(
+        property_account_payable_id = self.env["account.account"].sudo().search(
             domain, limit=1
-        )
+        )#company
         if property_account_payable_id:
             return property_account_payable_id
 
@@ -230,9 +259,9 @@ class XpmiToolsPartnerImport(models.Model):
             ("code", "=", account_receivable),
             ("name", "=", account_receivable),
         ]
-        property_account_receivable_id = self.env["account.account"].search(
+        property_account_receivable_id = self.env["account.account"].sudo().search(
             domain, limit=1
-        )
+        )#company
         if property_account_receivable_id:
             return property_account_receivable_id
 
@@ -251,7 +280,7 @@ class XpmiToolsPartnerImport(models.Model):
         self.ensure_one()
 
         domain = [("name", "=", self.bank_name)]
-        bank_id = self.env["res.bank"].search(domain, limit=1)
+        bank_id = self.env["res.bank"].sudo().search(domain, limit=1)
         if bank_id:
             return bank_id
 
@@ -262,11 +291,14 @@ class XpmiToolsPartnerImport(models.Model):
         import_data = self.search(domain, limit=1)
         return import_data.bank_id if import_data.bank_id else False
 
-    def _search_property_account_position(self):
+    def _search_property_account_position(self, company):
         self.ensure_one()
 
-        domain = [("name", "=", self.property_account_position)]
-        property_account_position_id = self.env["account.fiscal.position"].search(
+        domain = [("name", "=", self.property_account_position),
+                  "|",
+                  ("company_id", "=", company.id),
+                  ("company_id", "=", False)]
+        property_account_position_id = self.env["account.fiscal.position"].sudo().search(
             domain, limit=1
         )
         if property_account_position_id:
@@ -275,6 +307,7 @@ class XpmiToolsPartnerImport(models.Model):
         domain = [
             ("property_account_position", "=", self.property_account_position),
             ("property_account_position_id", "!=", False),
+            ("company", "=", self.company),
         ]
         import_data = self.search(domain, limit=1)
         return (
@@ -296,7 +329,7 @@ class XpmiToolsPartnerImport(models.Model):
         return import_data.lang if import_data.lang else ""
 
     # search datas linked by another tables
-    def _compute_data(self):  # noqa: C901
+    def _compute_data(self, company):  # noqa: C901
         self.ensure_one()
         data = self._default_data()
 
@@ -311,7 +344,7 @@ class XpmiToolsPartnerImport(models.Model):
                 self.error = _("State Not Found")
                 return False
         if not data["property_payment_term_id"] and self.property_payment_term:
-            data["property_payment_term_id"] = self._search_property_payment_term()
+            data["property_payment_term_id"] = self._search_property_payment_term(company)
             if not data["property_payment_term_id"]:
                 self.error = _("Customer Payment Terms Not Found")
                 return False
@@ -382,10 +415,10 @@ class XpmiToolsPartnerImport(models.Model):
 
         return partner_data
 
-    def _prepare_partner_data(self, data, partner_id):
+    def _prepare_partner_data(self, data, partner_id, company):
         self.ensure_one()
         partner_data = self._default_partner_data(partner_id)
-
+        partner_data["company_id"] = company.id
         if data["state_id"]:
             partner_data["state_id"] = data["state_id"].id
         if data["country_id"]:
@@ -455,13 +488,17 @@ class XpmiToolsPartnerImport(models.Model):
             partner_id.fax = self.fax
 
         bank_id = data.get("bank_id")
-        if bank_id and self.acc_number and partner_id:
+        bank_domain = ([("bank_id","=", bank_id.id),
+                        ("acc_number","=", self.acc_number)])
+        acc_number = self.env["res.partner.bank"].sudo().search(bank_domain)
+
+        if not acc_number and bank_id and self.acc_number and partner_id:
             bank_vals = {
                 "acc_number": self.acc_number,
                 "partner_id": partner_id.id,
                 "bank_id": bank_id.id,
             }
-            self.env["res.partner.bank"].create([bank_vals])
+            self.env["res.partner.bank"].sudo().create([bank_vals])
         return True
 
     def auto_import_partner(self):
@@ -470,9 +507,13 @@ class XpmiToolsPartnerImport(models.Model):
         for import_data in imports_datas:
             if not import_data._check_consistency():
                 continue
-
+            # searc company
+            company = import_data._search_company()
+            if not company:
+                import_data.error = _("Company missing")
+                continue
             # search partner
-            partner_id = import_data._search_partner()
+            partner_id = import_data._search_partner(company)
 
             # check partner
             if len(partner_id) != 1 and partner_id:
@@ -480,23 +521,23 @@ class XpmiToolsPartnerImport(models.Model):
                 continue
 
             # prepare partner data
-            data = import_data._compute_data()
+            data = import_data._compute_data(company)
             if not data:
                 continue
 
-            partner_data = import_data._prepare_partner_data(data, partner_id)
+            partner_data = import_data._prepare_partner_data(data, partner_id, company)
 
             # create/write partner
             if not partner_id:
                 partner_data["name"] = import_data.partner_name
                 try:
-                    partner_id = self.env["res.partner"].create([partner_data])
+                    partner_id = self.env["res.partner"].sudo().create([partner_data])
                 except Exception as error:
                     import_data.error = str(error)
                     continue
             else:
                 try:
-                    partner_id.write(partner_data)
+                    partner_id.sudo().write(partner_data)
                 except Exception as error:
                     import_data.error = str(error)
                     continue

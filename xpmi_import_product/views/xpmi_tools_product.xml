@@ -36,9 +36,14 @@
                     </div>
                     <group>
                         <group name="info" string="Info">
+                            <field name="done"  />
                             <field name="detailed_type" />
                             <field name="product_default_code" />
                             <field name="barcode" />
+                            <field name="brand" />
+                            <field name="brand_id" />
+                            <field name="company" />
+                            <field name="company_id" />
                             <field name="categ" />
                             <field name="categ_id" />
                             <field name="list_price" />

@@ -37,7 +37,10 @@
                     <group>
                         <group name="info" string="Info">
                             <field name="ref" />
+                            <field name="done" />
                             <field name="is_company" />
+                            <field name="company" />
+                            <field name="company_id" />
                             <field name="street" />
                             <field name="street2" />
                             <field name="city" />
