@@ -59,6 +59,7 @@
                 <field name="descrizione" />
                 <field name="evaso" />
                 <field name="errore" />
+                 <field name="company" />
             </list>
         </field>
     </record>

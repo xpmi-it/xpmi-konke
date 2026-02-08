@@ -51,12 +51,13 @@ class DaToolsSaleOrder(models.Model):
     carrier = fields.Char(string="Carrier")
     carrier_id = fields.Many2one('delivery.carrier', string="Delivery")
 
-    def _search_partner(self, ref_code):
+    def _search_partner(self, ref_code, company_id):
         if not ref_code:
             return None
 
-        domain = ["|", ("ref", "=", ref_code), ("ref", "ilike", ref_code)]
-        return self.env["res.partner"].search(domain, limit=1)
+        # domain = ["|", ("ref", "=", ref_code), ("ref", "ilike", ref_code)]
+        domain = ["&", ("company_id", "=", company_id), "|", ("ref", "=", ref_code), ("ref", "ilike", ref_code)]
+        return self.env["res.partner"].sudo().search(domain, limit=1)
 
     @api.model
     def hook_update_sale_order(self, sale_order):
@@ -89,7 +90,7 @@ class DaToolsSaleOrder(models.Model):
             )
 
             if hasattr(self.env["sale.order"], "type_id"):
-                partner = self._search_partner(import_data.client_code)
+                partner = self._search_partner(import_data.client_code, company_id)
                 if not partner:
                     import_data.errore = "Cliente non trovato"
                     continue
@@ -121,7 +122,7 @@ class DaToolsSaleOrder(models.Model):
             key_number = import_data.get_key_number()
             import_data.number = number_dict[key_number]
 
-    def _prepare_order_vals(self, partner, ship_partner, inv_partner, company):
+    def _prepare_order_vals(self, partner, ship_partner, inv_partner, company, team, carrier):
         vals = {
             "name": self.number,
             "client_order_ref": self.client_order_ref,
@@ -129,14 +130,16 @@ class DaToolsSaleOrder(models.Model):
             "partner_shipping_id": ship_partner.id,
             "partner_invoice_id": inv_partner.id,
             "company_id": company.id,
-            "team_id": company.id,
-            "carrier_id": company.id,
             "state": "draft",
         }
         if self.date:
             vals["date_order"] = self.date
         if self.date_delivery:
             vals["commitment_date"] = self.date_delivery
+        if self.team:
+            vals["team_id"] = team.id
+        if self.carrier:
+            vals["carrier_id"] = carrier.id
         if hasattr(self.env["sale.order"], "type_id"):
             sale_type = partner.with_company(self.env.company).sale_type
             if not sale_type:
@@ -177,11 +180,30 @@ class DaToolsSaleOrder(models.Model):
         prods = self.env["product.product"].search([("default_code", "in", prod_codes)])
         prod_map = {p.default_code: p for p in prods}
 
-        company = import_data._search_company()
 
         self.auto_set_number()
 
         for import_data in imports_datas:
+            company = import_data._search_company()
+
+            if not company:
+                import_data.errore = "Company non trovata"
+                continue
+
+            if import_data.team:
+                team = import_data._search_team(company.id)
+                if not team:
+                    import_data.errore = "team non trovato"
+                    continue
+            if import_data.carrier:
+                carrier = import_data._search_carrier(company.id)
+                if not carrier:
+                    import_data.errore = "carrier non trovato"
+                    continue
+
+
+
+
             # svuoto errore
             import_data.errore = ""
 
@@ -193,8 +215,9 @@ class DaToolsSaleOrder(models.Model):
                 continue
 
             # controllo cliente
-            partner = import_data._search_partner(import_data.client_code)
+            partner = import_data._search_partner(import_data.client_code, company_id=company.id)
             if not partner:
+            # if not partner:
                 import_data.errore = "Cliente non trovato"
                 continue
 
@@ -206,7 +229,7 @@ class DaToolsSaleOrder(models.Model):
 
             # controllo indirizzo consegna
             ship_partner = (
-                import_data._search_partner(import_data.delivery_code) or partner
+                import_data._search_partner(import_data.delivery_code, company.id) or partner
             )
             if not ship_partner:
                 import_data.errore = "Indirizzo di consegna non trovato"
@@ -214,20 +237,20 @@ class DaToolsSaleOrder(models.Model):
 
             # controllo indirizzo fattura
             inv_partner = (
-                import_data._search_partner(import_data.invoice_code) or partner
+                import_data._search_partner(import_data.invoice_code, company.id) or partner
             )
             if not inv_partner:
                 import_data.errore = "Indirizzo di fatturazione non trovato"
                 continue
 
             # controllo ordine
-            domain = [("name", "=", import_data.number), ("state", "=", "draft")]
-            order = self.env["sale.order"].search(domain, limit=1)
+            domain = [("name", "=", import_data.number), ("state", "=", "draft"), ("company_id","=", company.id)]
+            order = self.env["sale.order"].sudo().search(domain, limit=1)
             if not order:
                 vals = import_data._prepare_order_vals(
-                    partner, ship_partner, inv_partner
+                    partner, ship_partner, inv_partner, company, team, carrier
                 )
-                order = self.env["sale.order"].create(vals)
+                order = self.env["sale.order"].sudo().create(vals)
                 import_data.hook_update_sale_order(order)
 
             # aggiungo le righe
@@ -240,7 +263,7 @@ class DaToolsSaleOrder(models.Model):
 
 
             line_vals = import_data._prepare_line_vals(product, route)
-            self.env["sale.order.line"].create({**line_vals, "order_id": order.id})
+            self.env["sale.order.line"].sudo().create({**line_vals, "order_id": order.id})
 
             import_data.evaso = True
 
@@ -260,4 +283,49 @@ class DaToolsSaleOrder(models.Model):
         import_data = self.sudo().search(import_domains, limit=1)
         if import_data and import_data.company_id:
                 return import_data.company_id
+        return False
+
+    def _search_team(self, company_id):
+        self.ensure_one()
+        if self.team_id:
+            return self.team_id
+        self.team = self.team.strip()
+        # team_domain = [("name", "=ilike", self.team)]
+        team_domain = [
+            ('name', '=ilike', self.team),
+            '|',
+            ('company_id', '=', company_id),
+            ('company_id', '=', False)
+        ]
+
+        team = self.env["crm.team"].sudo().search(team_domain, limit=1)
+        if team:
+            return team
+
+        import_domains = [("team", "=", self.team), ("team_id", "!=", False)]
+        import_data = self.sudo().search(import_domains, limit=1)
+        if import_data and import_data.team_id:
+                return import_data.team_id
+        return False
+
+    def _search_carrier(self, company_id):
+        self.ensure_one()
+        if self.carrier_id:
+            return self.carrier_id
+        self.carrier = self.carrier.strip()
+        # carrier_domain = [("name", "=ilike", self.carrier)]
+        carrier_domain = [
+            ('name', '=ilike', self.carrier),
+            '|',
+            ('company_id', '=', company_id),
+            ('company_id', '=', False)
+        ]
+        carrier = self.env["delivery.carrier"].sudo().search(carrier_domain, limit=1)
+        if carrier:
+            return carrier
+
+        import_domains = [("carrier", "=", self.carrier), ("carrier_id", "!=", False)]
+        import_data = self.sudo().search(import_domains, limit=1)
+        if import_data and import_data.carrier_id:
+                return import_data.carrier_id
         return False
