@@ -287,7 +287,7 @@ class XpmiToolsProductImport(models.Model):
         company_domain = [("name", "=ilike", self.company)]
         company = self.env["res.company"].sudo().search(company_domain, limit=1)
         if company:
-            return company.id
+            return company
 
         import_domains = [("company", "=", self.company), ("company_id", "!=", False)]
         import_data = self.sudo().search(import_domains, limit=1)
