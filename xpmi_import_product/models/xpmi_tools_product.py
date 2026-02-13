@@ -139,8 +139,8 @@ class XpmiToolsProductImport(models.Model):
         domain = [
             ("code", "=", self.property_account_income),
             '|',
-            ('company_id', '=', company.id),
-            ('company_id', '=', False)
+            ('company_ids', '=', company.id),
+            ('company_ids', '=', False)
         ]
 
         property_account_income_id = self.env["account.account"].search(domain, limit=1)
@@ -165,8 +165,8 @@ class XpmiToolsProductImport(models.Model):
         domain = [
             ("code", "=", self.property_account_expense),
             '|',
-            ('company_id', '=', company.id),
-            ('company_id', '=', False)
+            ('company_ids', '=', company.id),
+            ('company_ids', '=', False)
         ]
         property_account_expense_id = self.env["account.account"].search(
             domain, limit=1
@@ -307,8 +307,8 @@ class XpmiToolsProductImport(models.Model):
         if not data["company_id"]:
             self.error = _("Company Not Found")
             return False
-        copmany = data["company_id"]
-        print(copmany)
+        company = data["company_id"]
+        print(company)
         if not data["property_account_income_id"]:
             data["property_account_income_id"] = self._search_property_account_income(company)
         if not data["property_account_income_id"]:
