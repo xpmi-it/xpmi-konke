@@ -1,7 +1,7 @@
 # Copyright (C) 2023-Today:
 # Dinamiche Aziendali srl (<http://www.dinamicheaziendali.it/>)
 # @author: Giuseppe Borruso (gborruso@dinamicheaziendali.it)
-# License GPL-3.0 or later (http://www.gnu.org/licenses/gpl.html).
+# License GPL-3.0 or later (http://www.gnu.org/licenses/gpl.html)....
 
 from odoo import _, api, fields, models
 
