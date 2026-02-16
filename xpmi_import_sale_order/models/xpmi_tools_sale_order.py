@@ -90,7 +90,7 @@ class DaToolsSaleOrder(models.Model):
             )
 
             if hasattr(self.env["sale.order"], "type_id"):
-                partner = self._search_partner(import_data.client_code, company_id)
+                partner = self._search_partner(import_data.client_code, 1)
                 if not partner:
                     import_data.errore = "Cliente non trovato"
                     continue
@@ -277,7 +277,7 @@ class DaToolsSaleOrder(models.Model):
         company_domain = [("name", "=ilike", self.company)]
         company = self.env["res.company"].sudo().search(company_domain, limit=1)
         if company:
-            return company.id
+            return company
 
         import_domains = [("company", "=", self.company), ("company_id", "!=", False)]
         import_data = self.sudo().search(import_domains, limit=1)
