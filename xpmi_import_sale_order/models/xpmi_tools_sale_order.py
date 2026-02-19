@@ -273,7 +273,7 @@ class DaToolsSaleOrder(models.Model):
         self.ensure_one()
         if self.company_id:
             return self.company_id
-        self.company = self.company.strip()
+        # self.company = self.company.strip()
         company_domain = [("name", "=ilike", self.company)]
         company = self.env["res.company"].sudo().search(company_domain, limit=1)
         if company:
@@ -289,7 +289,8 @@ class DaToolsSaleOrder(models.Model):
         self.ensure_one()
         if self.team_id:
             return self.team_id
-        self.team = self.team.strip()
+        if hasattr(self, 'team') and self.team:
+            self.team = self.team.strip()
         # team_domain = [("name", "=ilike", self.team)]
         team_domain = [
             ('name', '=ilike', self.team),
@@ -312,7 +313,8 @@ class DaToolsSaleOrder(models.Model):
         self.ensure_one()
         if self.carrier_id:
             return self.carrier_id
-        self.carrier = self.carrier.strip()
+        if hasattr(self, 'carrier') and self.carrier:
+            self.carrier = self.carrier.strip()
         # carrier_domain = [("name", "=ilike", self.carrier)]
         carrier_domain = [
             ('name', '=ilike', self.carrier),
