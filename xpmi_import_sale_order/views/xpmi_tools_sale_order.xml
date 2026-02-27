@@ -23,6 +23,8 @@
                     <field name="team_id" />
                     <field name="carrier" />
                     <field name="carrier_id" />
+                    <field name="currency" />
+                    <field name="currency_id" />
 
                     <field name="active" />
                     <field name="evaso" />
