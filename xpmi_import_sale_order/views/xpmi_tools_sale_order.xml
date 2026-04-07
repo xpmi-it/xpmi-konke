@@ -17,6 +17,15 @@
                 <group>
                     <field name="number" />
                     <field name="client_order_ref" />
+                    <field name="company" />
+                    <field name="company_id" />
+                    <field name="team" />
+                    <field name="team_id" />
+                    <field name="carrier" />
+                    <field name="carrier_id" />
+                    <field name="currency" />
+                    <field name="currency_id" />
+
                     <field name="active" />
                     <field name="evaso" />
                     <field name="client_code" />
@@ -52,6 +61,7 @@
                 <field name="descrizione" />
                 <field name="evaso" />
                 <field name="errore" />
+                 <field name="company" />
             </list>
         </field>
     </record>

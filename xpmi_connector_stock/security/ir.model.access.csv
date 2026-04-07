@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_connector_stock_manager,connector_stock manager,model_connector_stock,da_connector_base.group_connector_master,1,1,1,1
+access_connector_stock_user,connector_stock user,model_connector_stock,da_connector_base.group_connector_user,1,0,0,0
+
+access_connector_stock_line_manager,connector_stock_line manager,model_connector_stock_line,da_connector_base.group_connector_master,1,1,1,1
+access_connector_stock_line_user,connector_stock_line user,model_connector_stock_line,da_connector_base.group_connector_user,1,0,0,0

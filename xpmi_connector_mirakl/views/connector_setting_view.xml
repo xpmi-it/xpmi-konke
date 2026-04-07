@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="connector_setting_mirakl_form_view" model="ir.ui.view">
+        <field name="name">connector.setting.mirakl.form.view</field>
+        <field name="model">connector.setting</field>
+        <field name="inherit_id" ref="da_connector_base.connector_setting_form_view"/>
+        <field name="arch" type="xml">
+            <field name="user" position="after">
+                <field name="api_key" invisible="marketplace != 'mirakl'" required="marketplace == 'mirakl'"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="connector_setting_import_so_mirakl_form_view" model="ir.ui.view">
+        <field name="name">connector.setting.import.so.mirakl.form.view</field>
+        <field name="model">connector.setting</field>
+        <field name="inherit_id" ref="da_connector_sale_order.connector_setting_form_view_inherit"/>
+        <field name="arch" type="xml">
+            <field name="range_import_order" position="after">
+                <field name="mapping_product_mirakl"
+                       invisible="marketplace != 'mirakl'" required="marketplace == 'mirakl'"/>
+                <field name="mirakl_import_order_specific_channel"
+                       invisible="marketplace != 'mirakl'"/>
+                <field name="mirakl_channel_codes"
+                       invisible="marketplace != 'mirakl' or not mirakl_import_order_specific_channel or not import_order"
+                       required="mirakl_import_order_specific_channel"/>
+                <field name="mirakl_shop_code" invisible="marketplace != 'mirakl' or not import_order"/>
+                <field name="use_shop_in_acceptance_call" invisible="marketplace != 'mirakl' or not import_order"/>
+            </field>
+            <xpath expr="//page[@name='carrier_lines']/group" position="before">
+                <button name="mirakl_get_carrier_info" type="object" string="Get Carrier Info"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

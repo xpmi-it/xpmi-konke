@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>XPMI Clean Email Layout</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; color: #2b2b2b; }
+    .container { max-width: 980px; margin: 0 auto; padding: 16px; }
+    h1 { font-size: 28px; margin: 0 0 8px; }
+    h2 { font-size: 20px; margin: 24px 0 8px; }
+    p { line-height: 1.5; margin: 8px 0; }
+    ul { margin: 8px 0 16px; padding-left: 18px; }
+    .img { width: 100%; border: 1px solid #e5e5e5; border-radius: 6px; }
+    .label { font-size: 12px; color: #666; margin: 6px 0 12px; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>XPMI Clean Email Layout</h1>
+    <p>
+      Modulo che semplifica le email di notifica Odoo con un flag aziendale.
+      Il logo e il nome azienda restano visibili.
+    </p>
+
+    <h2>Funzionalita</h2>
+    <ul>
+      <li>Nasconde il blocco titolo documento (es. "Your Transfer" + numero).</li>
+      <li>Nasconde la riga contatti aziendali (telefono, email, sito).</li>
+      <li>Nasconde il footer "Powered by Odoo".</li>
+    </ul>
+
+    <h2>Prima / Dopo</h2>
+    <div class="grid">
+      <div>
+        <img class="img" src="before.png" alt="Before" />
+        <div class="label">Before</div>
+      </div>
+      <div>
+        <img class="img" src="after.png" alt="After" />
+        <div class="label">After</div>
+      </div>
+    </div>
+
+    <h2>Configurazione</h2>
+    <p>
+      Impostazioni &gt; Aziende &gt; (azienda) &gt; abilita "Nascondi header e footer email".
+    </p>
+    <img class="img" src="company-config.png" alt="Company configuration" />
+  </div>
+</body>
+</html>

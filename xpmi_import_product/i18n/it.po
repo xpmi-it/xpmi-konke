@@ -1,0 +1,352 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* da_import_product
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-10-25 12:34+0000\n"
+"PO-Revision-Date: 2024-10-25 12:34+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__active
+msgid "Active"
+msgstr "Attivo"
+
+#. module: da_import_product
+#: model_terms:ir.ui.view,arch_db:da_import_product.import_product_form_view
+#: model_terms:ir.ui.view,arch_db:da_import_product.import_product_search
+msgid "Archived"
+msgstr "In archivio"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__barcode
+msgid "Barcode"
+msgstr "Codice a barre"
+
+#. module: da_import_product
+#: model:ir.model.fields.selection,name:da_import_product.selection__da_tools_product_import__tracking__lot
+msgid "By Lots"
+msgstr "Per lotti"
+
+#. module: da_import_product
+#: model:ir.model.fields.selection,name:da_import_product.selection__da_tools_product_import__tracking__serial
+msgid "By Unique Serial Number"
+msgstr "Per numero di serie univoco"
+
+#. module: da_import_product
+#: model:ir.model.fields.selection,name:da_import_product.selection__da_tools_product_import__detailed_type__combo
+msgid "Combo"
+msgstr ""
+
+#. module: da_import_product
+#: model:ir.model.fields.selection,name:da_import_product.selection__da_tools_product_import__detailed_type__consu
+msgid "Consumable"
+msgstr "Consumabile"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__create_uid
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__create_date
+msgid "Created on"
+msgstr "Creato li"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__taxes
+msgid "Customer Taxes"
+msgstr "Imposte cliente"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__taxes_id
+msgid "Customer Taxes ID"
+msgstr "Imposte cliente ID"
+
+#. module: da_import_product
+#. odoo-python
+#: code:addons/da_import_product/models/da_tools_product.py:0
+msgid "Customer Taxes Not Found"
+msgstr "Imposte cliente non trovate"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__description
+msgid "Description"
+msgstr "Descrizione"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__display_name
+msgid "Display Name"
+msgstr "Nome visualizzato"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__done
+#: model_terms:ir.ui.view,arch_db:da_import_product.import_product_form_view
+#: model_terms:ir.ui.view,arch_db:da_import_product.import_product_search
+msgid "Done"
+msgstr "Evaso"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__error
+#: model_terms:ir.ui.view,arch_db:da_import_product.import_product_search
+msgid "Error"
+msgstr "Errore"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__property_account_expense
+msgid "Expense Account"
+msgstr "Conto di costo"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__property_account_expense_id
+msgid "Expense Account ID"
+msgstr "Conto di costo ID"
+
+#. module: da_import_product
+#. odoo-python
+#: code:addons/da_import_product/models/da_tools_product.py:0
+msgid "Expense Account Not Found"
+msgstr "Conto di costo non trovato"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__id
+msgid "ID"
+msgstr ""
+
+#. module: da_import_product
+#: model:ir.actions.act_window,name:da_import_product.da_tools_product_import_action
+#: model_terms:ir.ui.view,arch_db:da_import_product.import_product_form_view
+msgid "Import Product"
+msgstr "Importa prodotto"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__property_account_income
+msgid "Income Account"
+msgstr "Conto di ricavo"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__property_account_income_id
+msgid "Income Account ID"
+msgstr "Conto di ricavo ID"
+
+#. module: da_import_product
+#. odoo-python
+#: code:addons/da_import_product/models/da_tools_product.py:0
+msgid "Income Account Not Found"
+msgstr "Conto di ricavo non trovato"
+
+#. module: da_import_product
+#: model_terms:ir.ui.view,arch_db:da_import_product.import_product_form_view
+msgid "Info"
+msgstr ""
+
+#. module: da_import_product
+#: model_terms:ir.ui.view,arch_db:da_import_product.import_product_form_view
+msgid "Internal Notes"
+msgstr "Note interne"
+
+#. module: da_import_product
+#: model_terms:ir.ui.view,arch_db:da_import_product.import_product_form_view
+msgid "Invoicing"
+msgstr "Fatturazione"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__write_uid
+msgid "Last Updated by"
+msgstr "Ultimo aggiornamento di"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__write_date
+msgid "Last Updated on"
+msgstr "Ultimo aggiornamento il"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__name
+#: model_terms:ir.ui.view,arch_db:da_import_product.import_product_form_view
+msgid "Name"
+msgstr "Nome"
+
+#. module: da_import_product
+#: model:ir.model.fields.selection,name:da_import_product.selection__da_tools_product_import__tracking__none
+msgid "No Tracking"
+msgstr "Nessuna tracciabilità"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__partner_id
+msgid "Partner"
+msgstr ""
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__categ
+msgid "Product Category"
+msgstr "Categoria prodotto"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__categ_id
+msgid "Product Category ID"
+msgstr "Categoria prodotto ID"
+
+#. module: da_import_product
+#. odoo-python
+#: code:addons/da_import_product/models/da_tools_product.py:0
+msgid "Product Category Not Found"
+msgstr "Categoria prodotto non trovata"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__product_default_code
+msgid "Product Default Code"
+msgstr "Riferimento interno prodotto"
+
+#. module: da_import_product
+#: model:ir.model,name:da_import_product.model_da_tools_product_import
+msgid "Product Import"
+msgstr "Importa prodotto"
+
+#. module: da_import_product
+#: model:ir.ui.menu,name:da_import_product.menu_product_import
+msgid "Product Tools"
+msgstr "Prodotto Tools"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__detailed_type
+msgid "Product Type"
+msgstr "Tipologia prodotto"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__uom_po
+msgid "Purchase UoM"
+msgstr "Unità di misura acquisto"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__uom_po_id
+msgid "Purchase UoM ID"
+msgstr "Unità di misura acquisto ID"
+
+#. module: da_import_product
+#. odoo-python
+#: code:addons/da_import_product/models/da_tools_product.py:0
+msgid "Purchase UoM Not Found"
+msgstr "Unità di misura acquisto non trovata"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__list_price
+msgid "Sales Price"
+msgstr "Prezzo di vendita"
+
+#. module: da_import_product
+#: model:ir.model.fields.selection,name:da_import_product.selection__da_tools_product_import__detailed_type__service
+msgid "Service"
+msgstr "Servizio"
+
+#. module: da_import_product
+#. odoo-python
+#: code:addons/da_import_product/models/da_tools_product.py:0
+msgid "Set Product Default Code or Barcode"
+msgstr "Imposta riferimento interno prodotto o codice a barre"
+
+#. module: da_import_product
+#: model_terms:ir.ui.view,arch_db:da_import_product.import_product_form_view
+msgid "Stock"
+msgstr "Magazzino"
+
+#. module: da_import_product
+#: model:ir.model.fields.selection,name:da_import_product.selection__da_tools_product_import__detailed_type__product
+msgid "Storable Product"
+msgstr "Prodotto stoccabile"
+
+#. module: da_import_product
+#: model_terms:ir.ui.view,arch_db:da_import_product.import_product_form_view
+msgid "Supplier"
+msgstr "Fornitore"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__supplier_delay
+msgid "Supplier Delivery Lead Time"
+msgstr "Tempo di consegna fornitore"
+
+#. module: da_import_product
+#. odoo-python
+#: code:addons/da_import_product/models/da_tools_product.py:0
+msgid "Supplier Not Found"
+msgstr "Fornitore non trovato"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__supplier_price
+msgid "Supplier Price"
+msgstr "Prezzo fornitore"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__supplier_product_code
+msgid "Supplier Product Code"
+msgstr "Codice prodotto fornitore"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__supplier_product_name
+msgid "Supplier Product Name"
+msgstr "Nome prdotto fornitore"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__supplier_ref
+msgid "Supplier Reference"
+msgstr "Riferimento fornitore"
+
+#. module: da_import_product
+#. odoo-python
+#: code:addons/da_import_product/models/da_tools_product.py:0
+msgid "There are many partner with same data"
+msgstr "Ci sono più partner con stessi dati"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__tracking
+msgid "Tracking"
+msgstr "Tracciare"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__uom
+msgid "Unit of Measure"
+msgstr "Unità di misura"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__uom_id
+msgid "Unit of Measure ID"
+msgstr "Unità di misura ID"
+
+#. module: da_import_product
+#. odoo-python
+#: code:addons/da_import_product/models/da_tools_product.py:0
+msgid "Unit of Measure Not Found"
+msgstr "Unità di misura non trovato"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__supplier_taxes
+msgid "Vendor Taxes"
+msgstr "Imposte fornitore"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__supplier_taxes_id
+msgid "Vendor Taxes ID"
+msgstr "Imposte fornitore ID"
+
+#. module: da_import_product
+#. odoo-python
+#: code:addons/da_import_product/models/da_tools_product.py:0
+msgid "Vendor Taxes Not Found"
+msgstr "Imposte fornitore non trovato"
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__volume
+msgid "Volume"
+msgstr ""
+
+#. module: da_import_product
+#: model:ir.model.fields,field_description:da_import_product.field_da_tools_product_import__weight
+msgid "Weight"
+msgstr "Peso"

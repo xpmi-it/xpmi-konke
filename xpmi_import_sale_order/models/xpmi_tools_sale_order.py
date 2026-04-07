@@ -44,13 +44,58 @@ class DaToolsSaleOrder(models.Model):
     sconto = fields.Float(string="Sconto 1 %")
     sconto2 = fields.Float(string="Sconto 2 %")
     sconto3 = fields.Float(string="Sconto 3 %")
+    company = fields.Char(string="Company")
+    company_id = fields.Many2one("res.company", string="Company ID")
+    team = fields.Char(string="Team")
+    team_id = fields.Many2one('crm.team', 'Sales Team')
+    carrier = fields.Char(string="Carrier")
+    carrier_id = fields.Many2one('delivery.carrier', string="Delivery")
+    currency = fields.Char(string="Valuta (Nome/Codice)")
+    currency_id = fields.Many2one('res.currency', string="Valuta ID")
 
-    def _search_partner(self, ref_code):
+    def _search_partner(self, ref_code, company_id):
         if not ref_code:
             return None
 
-        domain = ["|", ("ref", "=", ref_code), ("ref", "ilike", ref_code)]
-        return self.env["res.partner"].search(domain, limit=1)
+        domain = ["&", ("company_id", "=", company_id), "|", ("ref", "=", ref_code), ("ref", "ilike", ref_code)]
+        return self.env["res.partner"].sudo().search(domain, limit=1)
+
+    def _search_currency(self):
+        self.ensure_one()
+        if self.currency_id:
+            return self.currency_id
+        if self.currency:
+            currency_code = self.currency.strip().upper()
+            curr = self.env["res.currency"].sudo().search([
+                ("name", "=", currency_code)
+            ], limit=1)
+        if curr:
+            return curr
+        import_domains = [("currency", "=", self.currency), ("currency_id", "!=", False)]
+        import_data = self.sudo().search(import_domains, limit=1)
+        if import_data and import_data.currency_id:
+            return import_data.currency_id
+
+        return False
+
+    def _search_pricelist(self, currency_id, company_id=False):
+        # currency_id = currency.id if hasattr(currency, 'id') else currency
+        # c_id = currency_id.id if hasattr(currency_id, 'id') else currency_id
+        # Cerchiamo il primo listino attivo con quella valuta
+        pricelist_domain = [
+            ('currency_id', '=', currency_id),
+            ('active', '=', True),
+            '|',
+            ('company_id', '=', company_id),
+            ('company_id', '=', False)
+        ]
+
+
+        pricelist = self.env['product.pricelist'].sudo().search(pricelist_domain
+        , limit=1)
+
+        return pricelist
+
 
     @api.model
     def hook_update_sale_order(self, sale_order):
@@ -58,9 +103,6 @@ class DaToolsSaleOrder(models.Model):
         if not sale_order:
             return False
 
-        # sale_order.onchange_partner_id()
-        # sale_order.onchange_partner_id_warning()
-        # sale_order.onchange_partner_shipping_id()
         if self.date_delivery:
             sale_order._onchange_commitment_date()
         if hasattr(self.env["sale.order"], "type_id"):
@@ -83,7 +125,7 @@ class DaToolsSaleOrder(models.Model):
             )
 
             if hasattr(self.env["sale.order"], "type_id"):
-                partner = self._search_partner(import_data.client_code)
+                partner = self._search_partner(import_data.client_code, 1)
                 if not partner:
                     import_data.errore = "Cliente non trovato"
                     continue
@@ -115,20 +157,28 @@ class DaToolsSaleOrder(models.Model):
             key_number = import_data.get_key_number()
             import_data.number = number_dict[key_number]
 
-    def _prepare_order_vals(self, partner, ship_partner, inv_partner):
+    def _prepare_order_vals(self, partner, ship_partner, inv_partner, company, team, carrier, currency, pricelist):
         vals = {
             "name": self.number,
             "client_order_ref": self.client_order_ref,
             "partner_id": partner.id,
             "partner_shipping_id": ship_partner.id,
             "partner_invoice_id": inv_partner.id,
-            "company_id": self.env.company.id,
+            "company_id": company.id,
             "state": "draft",
         }
         if self.date:
             vals["date_order"] = self.date
         if self.date_delivery:
             vals["commitment_date"] = self.date_delivery
+        if self.team:
+            vals["team_id"] = team.id
+        if self.carrier:
+            vals["carrier_id"] = carrier.id
+        if currency:
+            vals["currency_id"] = currency.id
+        if pricelist:
+            vals["pricelist_id"] = pricelist.id
         if hasattr(self.env["sale.order"], "type_id"):
             sale_type = partner.with_company(self.env.company).sale_type
             if not sale_type:
@@ -169,9 +219,41 @@ class DaToolsSaleOrder(models.Model):
         prods = self.env["product.product"].search([("default_code", "in", prod_codes)])
         prod_map = {p.default_code: p for p in prods}
 
+
         self.auto_set_number()
 
         for import_data in imports_datas:
+            company = import_data._search_company()
+
+            if not company:
+                import_data.errore = "Company non trovata"
+                continue
+
+            team=""
+            carrier=""
+            if import_data.team:
+                team = import_data._search_team(company.id)
+                if not team:
+                    import_data.errore = "team non trovato"
+                    continue
+            if import_data.carrier:
+                carrier = import_data._search_carrier(company.id)
+                if not carrier:
+                    import_data.errore = "carrier non trovato"
+                    continue
+            currency = ""
+            pricelist = ""
+            if import_data.currency:
+                currency = import_data._search_currency()
+                if not currency:
+                    import_data.errore = "Valuta non trovata"
+                    continue
+                # find a price list
+                pricelist = import_data._search_pricelist(currency.id, company.id)
+                if not pricelist:
+                    import_data.errore = "Listino in Valuta non trovato"
+                    continue
+
             # svuoto errore
             import_data.errore = ""
 
@@ -183,8 +265,9 @@ class DaToolsSaleOrder(models.Model):
                 continue
 
             # controllo cliente
-            partner = import_data._search_partner(import_data.client_code)
+            partner = import_data._search_partner(import_data.client_code, company_id=company.id)
             if not partner:
+            # if not partner:
                 import_data.errore = "Cliente non trovato"
                 continue
 
@@ -196,7 +279,7 @@ class DaToolsSaleOrder(models.Model):
 
             # controllo indirizzo consegna
             ship_partner = (
-                import_data._search_partner(import_data.delivery_code) or partner
+                import_data._search_partner(import_data.delivery_code, company.id) or partner
             )
             if not ship_partner:
                 import_data.errore = "Indirizzo di consegna non trovato"
@@ -204,20 +287,20 @@ class DaToolsSaleOrder(models.Model):
 
             # controllo indirizzo fattura
             inv_partner = (
-                import_data._search_partner(import_data.invoice_code) or partner
+                import_data._search_partner(import_data.invoice_code, company.id) or partner
             )
             if not inv_partner:
                 import_data.errore = "Indirizzo di fatturazione non trovato"
                 continue
 
             # controllo ordine
-            domain = [("name", "=", import_data.number), ("state", "=", "draft")]
-            order = self.env["sale.order"].search(domain, limit=1)
+            domain = [("name", "=", import_data.number), ("state", "=", "draft"), ("company_id","=", company.id)]
+            order = self.env["sale.order"].sudo().search(domain, limit=1)
             if not order:
                 vals = import_data._prepare_order_vals(
-                    partner, ship_partner, inv_partner
+                    partner, ship_partner, inv_partner, company, team, carrier, currency, pricelist
                 )
-                order = self.env["sale.order"].create(vals)
+                order = self.env["sale.order"].sudo().create(vals)
                 import_data.hook_update_sale_order(order)
 
             # aggiungo le righe
@@ -230,8 +313,70 @@ class DaToolsSaleOrder(models.Model):
 
 
             line_vals = import_data._prepare_line_vals(product, route)
-            self.env["sale.order.line"].create({**line_vals, "order_id": order.id})
+            self.env["sale.order.line"].sudo().create({**line_vals, "order_id": order.id})
 
             import_data.evaso = True
 
         return True
+
+    def _search_company(self):
+        self.ensure_one()
+        if self.company_id:
+            return self.company_id
+        company_domain = [("name", "=ilike", self.company)]
+        company = self.env["res.company"].sudo().search(company_domain, limit=1)
+        if company:
+            return company
+
+        import_domains = [("company", "=", self.company), ("company_id", "!=", False)]
+        import_data = self.sudo().search(import_domains, limit=1)
+        if import_data and import_data.company_id:
+                return import_data.company_id
+        return False
+
+    def _search_team(self, company_id):
+        self.ensure_one()
+        if self.team_id:
+            return self.team_id
+        if hasattr(self, 'team') and self.team:
+            self.team = self.team.strip()
+        # team_domain = [("name", "=ilike", self.team)]
+        team_domain = [
+            ('name', '=ilike', self.team),
+            '|',
+            ('company_id', '=', company_id),
+            ('company_id', '=', False)
+        ]
+
+        team = self.env["crm.team"].sudo().search(team_domain, limit=1)
+        if team:
+            return team
+
+        import_domains = [("team", "=", self.team), ("team_id", "!=", False)]
+        import_data = self.sudo().search(import_domains, limit=1)
+        if import_data and import_data.team_id:
+                return import_data.team_id
+        return False
+
+    def _search_carrier(self, company_id):
+        self.ensure_one()
+        if self.carrier_id:
+            return self.carrier_id
+        if hasattr(self, 'carrier') and self.carrier:
+            self.carrier = self.carrier.strip()
+        # carrier_domain = [("name", "=ilike", self.carrier)]
+        carrier_domain = [
+            ('name', '=ilike', self.carrier),
+            '|',
+            ('company_id', '=', company_id),
+            ('company_id', '=', False)
+        ]
+        carrier = self.env["delivery.carrier"].sudo().search(carrier_domain, limit=1)
+        if carrier:
+            return carrier
+
+        import_domains = [("carrier", "=", self.carrier), ("carrier_id", "!=", False)]
+        import_data = self.sudo().search(import_domains, limit=1)
+        if import_data and import_data.carrier_id:
+                return import_data.carrier_id
+        return False

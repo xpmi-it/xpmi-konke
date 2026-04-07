@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_connector_stock_line" model="ir.actions.act_window">
+        <field name="name">Stock</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">connector.stock.line</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="connector_stock_line" name="Stock Line" parent="da_connector_base.connector_setting_main"
+              action="action_connector_stock_line" sequence="99"
+              groups="da_connector_base.group_connector_master,da_connector_base.group_connector_user"/>
+
+    <record model="ir.ui.view" id="connector_stock_line_tree_view">
+        <field name="name">connector.stock.line.tree.view</field>
+        <field name="model">connector.stock.line</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="connector_stock_id" invisible="1"/>
+                <field name="product_id"/>
+                <field name="qty_available"/>
+                <field name="virtual_available"/>
+                <field name="qty_dropshipping"/>
+                <field name="long_forecast_qty"/>
+                <field name="manual"/>
+                <field name="write_date"/>
+                <button name="reset_qty_stock_line"
+                        string="Reset Qty"
+                        invisible="not manual"
+                        type="object"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+</odoo>

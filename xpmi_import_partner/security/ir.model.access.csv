@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_import_partner_tools_group,xpmi_tools_partner,model_xpmi_tools_partner_import,xpmi_import.import_tools_group_user,1,1,1,1

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="connector_orders_main" name="Orders" parent="da_connector_base.connector_root" sequence="1"
+              groups="da_connector_base.group_connector_master,da_connector_base.group_connector_user"/>
+
+    <record id="action_connector_orders" model="ir.actions.act_window">
+        <field name="name">Orders</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">connector.order</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="connector_orders" name="Orders" parent="da_connector_base.connector_setting_main"
+              action="action_connector_orders" sequence="1"
+              groups="da_connector_base.group_connector_master,da_connector_base.group_connector_user"/>
+
+    <!--Form-->
+    <record model="ir.ui.view" id="connector_order_form_view">
+        <field name="name">connector.order.form.view</field>
+        <field name="model">connector.order</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="import_sale_order" type="object" string="Import SO"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="connector_partner_id"/>
+                            <field name="partner_id"/>
+                            <field name="order_ref"/>
+                            <field name="marketplace"/>
+                            <field name="marketplace_name"/>
+                            <field name="amount_shipping"/>
+                            <field name="amount_tax"/>
+                            <field name="shipping_tax"/>
+                            <field name="connector_state"/>
+                            <field name="sale_id"/>
+                            <field name="error"/>
+                        </group>
+                        <group>
+                            <field name="connector_partner_shipping_id"/>
+                            <field name="partner_shipping_id"/>
+                            <field name="marketplace_code"/>
+                            <field name="marketplace_order_code"/>
+                            <field name="amount_untaxed"/>
+                            <field name="amount_total"/>
+                            <field name="currency"/>
+                            <field name="currency_id"/>
+                            <field name="imported"/>
+                            <field name="error_text"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Order Lines">
+                            <field name="order_line_ids">
+                                <list editable="bottom">
+                                    <field name="connector_order_id" invisible="1"/>
+                                    <field name="sku"/>
+                                    <field name="barcode"/>
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="id_connector"/>
+                                    <field name="quantity"/>
+                                    <field name="quantity_refunded"/>
+                                    <field name="price_unit"/>
+                                    <field name="vat_rate"/>
+                                    <field name="vat_included"/>
+                                    <field name="shipping_vat_rate"/>
+                                    <field name="price_total"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Other Info" name="other_info">
+                            <group>
+                                <group>
+                                    <field name="connector_setting_id"/>
+                                    <field name="carrier_name"/>
+                                    <field name="shop_channel_name"/>
+                                    <field name="shipped_order_date"/>
+                                    <field name="delivery_note_file"/>
+                                    <field name="pickup_point_id"/>
+                                </group>
+                                <group>
+                                    <field name="create_order_date"/>
+                                    <field name="carrier_id"/>
+                                    <field name="shop_channel_id"/>
+                                    <field name="update_order_date"/>
+                                    <field name="tracking_number"/>
+                                    <field name="tracking_url"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="refunded"/>
+                                <field name="refund_date"/>
+                                <field name="refund_product_cost"/>
+                            </group>
+
+                        </page>
+                        <page string="Call and Response" name="call_response_info">
+                            <group>
+                                <field name="call_acceptance"/>
+                                <field name="error_acceptance"/>
+                            </group>
+                            <group>
+                                <field name="call_update_customer_info"/>
+                            </group>
+                            <group>
+                                <field name="call_update_carrier_info"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--Tree-->
+    <record model="ir.ui.view" id="connector_order_tree_view">
+        <field name="name">connector.order.tree.view</field>
+        <field name="model">connector.order</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="order_ref"/>
+                <field name="connector_setting_id"/>
+                <field name="connector_partner_id"/>
+                <field name="state"/>
+                <field name="imported"/>
+            </list>
+        </field>
+    </record>
+
+    <!--Search-->
+    <record model="ir.ui.view" id="connector_order_search_view">
+        <field name="name">connector.order.search.view</field>
+        <field name="model">connector.order</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="marketplace"/>
+                <field name="connector_partner_id"/>
+                <field name="amount_shipping"/>
+                <field name="amount_tax"/>
+                <field name="sale_id"/>
+                <field name="order_ref"/>
+                <field name="partner_id"/>
+                <field name="amount_untaxed"/>
+                <field name="amount_total"/>
+                <field name="imported"/>
+                <field name="error"/>
+                <field name="error_text"/>
+                <filter string="Error" name="error" domain="[('error', '=', True)]"/>
+                <filter string="No Error" name="no_error" domain="[('error', '=', False)]"/>
+                <separator/>
+                <filter string="Imported" name="imported" domain="[('imported', '=', True)]"/>
+                <filter string="Not Imported" name="not_imported" domain="[('imported', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--Form-->
+    <record model="ir.ui.view" id="connector_setting_form_view">
+        <field name="name">connector.setting.form.view</field>
+        <field name="model">connector.setting</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="user"/>
+                            <field name="mapping_product"/>
+                            <field name="warehouse_id"/>
+                            <field name="country_id"/>
+
+                        </group>
+                        <group>
+                            <field name="marketplace"/>
+                            <field name="passwd"/>
+                            <field name="sale_order_team_id"/>
+                            <field name="pricelist_id"/>
+                            <field name="lang"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Pricelist" name="pricelist_setting">
+                            <group string="Pricelist">
+                                <field name="send_pricelist"/>
+                                <field name="pricelist_file_name"
+                                       invisible="send_pricelist != 'sftp'"/>
+                                <field name="pricelist_file" filename="pricelist_file_name"/>
+                                <field name="pricelist_user_sftp"
+                                       invisible="send_pricelist != 'sftp'"/>
+                                <field name="pricelist_pwd_sftp" password="True"
+                                       invisible="send_pricelist != 'sftp'"/>
+                                <field name="pricelist_port_sftp"
+                                       invisible="send_pricelist != 'sftp'"/>
+                                <field name="pricelist_ip_sftp"
+                                       invisible="send_pricelist != 'sftp'"/>
+                                <field name="pricelist_file_path_sftp"
+                                       invisible="send_pricelist != 'sftp'"/>
+                            </group>
+                        </page>
+                    </notebook>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--Tree-->
+    <record model="ir.ui.view" id="connector_setting_tree_view">
+        <field name="name">connector.setting.tree.view</field>
+        <field name="model">connector.setting</field>
+        <field name="arch" type="xml">
+            <list>
+                <!--                <button name="import_all_orders" string="Import Orders" type="object"/>-->
+                <field name="name"/>
+                <field name="mapping_product"/>
+                <field name="lang"/>
+                <field name="marketplace"/>
+            </list>
+        </field>
+    </record>
+
+    <!--Search-->
+    <record model="ir.ui.view" id="connector_setting_search_view">
+        <field name="name">connector.setting.search.view</field>
+        <field name="model">connector.setting</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="user"/>
+                <field name="warehouse_id"/>
+                <field name="lang"/>
+                <field name="marketplace"/>
+                <field name="sale_order_team_id"/>
+                <field name="pricelist_id"/>
+            </search>
+        </field>
+    </record>
+
+</odoo>

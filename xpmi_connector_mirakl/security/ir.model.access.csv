@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_accept_order_mirakl_wizard,accept_order_mirakl_wizard manager,model_accept_order_mirakl_wizard,da_connector_base.group_connector_master,1,1,1,1
