@@ -127,9 +127,7 @@ class XpmiToolsProductImport(models.Model):
             "uom_po_id": (
                 self.uom_po_id if self.uom_po_id else self.uom_id or self.env["uom.uom"]
             ),
-            # "brand_id": self.brand_id or self.env["product.brand"],
             "company_id": self.company_id or self.env["res.company"],
-
         }
         return data
 
@@ -283,7 +281,7 @@ class XpmiToolsProductImport(models.Model):
         self.ensure_one()
         if self.company_id:
             return self.company_id
-        self.company = self.company.strip()
+        self.company = self.company.strip() if self.company else self.company
         company_domain = [("name", "=ilike", self.company)]
         company = self.env["res.company"].sudo().search(company_domain, limit=1)
         if company:
@@ -356,18 +354,6 @@ class XpmiToolsProductImport(models.Model):
         if not data["uom_po_id"]:
             self.error = _("Purchase UoM Not Found")
             return False
-
-        # if not data["brand_id"] and self.brand:
-        #     data["brand_id"] = self._search_brand()
-        # if not data["brand_id"]:
-        #     self.error = _("Unit of Measure Not Found")
-        #     return False
-
-
-
-
-
-
         return data
 
     def _default_product_data(self, product_id):
@@ -515,6 +501,8 @@ class XpmiToolsProductImport(models.Model):
 
     def auto_import_product(self):
         imports_datas = self.search([("done", "=", False)])
+        config_settings = self.env['res.config.settings'].create({})
+        invoice_policy = config_settings.default_invoice_policy
 
         for import_data in imports_datas:
             if not import_data._check_consistency():
@@ -543,7 +531,7 @@ class XpmiToolsProductImport(models.Model):
                 product_data["name"] = import_data.name
                 try:
                     product_id = self.env["product.product"].sudo().create([product_data])
-                    import_data.update_template_product(product_id)
+                    import_data.update_template_product(product_id, invoice_policy)
 
                 except Exception as error:
                     import_data.error = str(error)
@@ -551,7 +539,7 @@ class XpmiToolsProductImport(models.Model):
             else:
                 try:
                     product_id.sudo().write(product_data)
-                    import_data.update_template_product(product_id)
+                    import_data.update_template_product(product_id, invoice_policy)
                 except Exception as error:
                     import_data.error = str(error)
                     continue
@@ -563,10 +551,12 @@ class XpmiToolsProductImport(models.Model):
             import_data.done = True
             self.env.cr.commit()  # pylint: disable=E8102
 
-    def update_template_product(self, product_id):
+    def update_template_product(self, product_id, invoice_policy):
+        # update forzato.
         template = product_id.product_tmpl_id
-        if self.brand:
-            brand = self._search_brand()
-            template.write({
-                'product_brand_id': brand,
-            })
+
+        brand = self._search_brand() if self.brand else False
+        template.write({
+            'product_brand_id': brand,
+            'invoice_policy': invoice_policy,
+        })

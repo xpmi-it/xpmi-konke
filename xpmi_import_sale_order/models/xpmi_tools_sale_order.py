@@ -78,6 +78,25 @@ class DaToolsSaleOrder(models.Model):
 
         return False
 
+    def _search_pricelist(self, currency_id, company_id=False):
+        # currency_id = currency.id if hasattr(currency, 'id') else currency
+        # c_id = currency_id.id if hasattr(currency_id, 'id') else currency_id
+        # Cerchiamo il primo listino attivo con quella valuta
+        pricelist_domain = [
+            ('currency_id', '=', currency_id),
+            ('active', '=', True),
+            '|',
+            ('company_id', '=', company_id),
+            ('company_id', '=', False)
+        ]
+
+
+        pricelist = self.env['product.pricelist'].sudo().search(pricelist_domain
+        , limit=1)
+
+        return pricelist
+
+
     @api.model
     def hook_update_sale_order(self, sale_order):
         """Hook for many update after creation from other modules"""
@@ -138,7 +157,7 @@ class DaToolsSaleOrder(models.Model):
             key_number = import_data.get_key_number()
             import_data.number = number_dict[key_number]
 
-    def _prepare_order_vals(self, partner, ship_partner, inv_partner, company, team, carrier, currency):
+    def _prepare_order_vals(self, partner, ship_partner, inv_partner, company, team, carrier, currency, pricelist):
         vals = {
             "name": self.number,
             "client_order_ref": self.client_order_ref,
@@ -158,6 +177,8 @@ class DaToolsSaleOrder(models.Model):
             vals["carrier_id"] = carrier.id
         if currency:
             vals["currency_id"] = currency.id
+        if pricelist:
+            vals["pricelist_id"] = pricelist.id
         if hasattr(self.env["sale.order"], "type_id"):
             sale_type = partner.with_company(self.env.company).sale_type
             if not sale_type:
@@ -221,12 +242,17 @@ class DaToolsSaleOrder(models.Model):
                     import_data.errore = "carrier non trovato"
                     continue
             currency = ""
+            pricelist = ""
             if import_data.currency:
                 currency = import_data._search_currency()
                 if not currency:
                     import_data.errore = "Valuta non trovata"
                     continue
-
+                # find a price list
+                pricelist = import_data._search_pricelist(currency.id, company.id)
+                if not pricelist:
+                    import_data.errore = "Listino in Valuta non trovato"
+                    continue
 
             # svuoto errore
             import_data.errore = ""
@@ -272,7 +298,7 @@ class DaToolsSaleOrder(models.Model):
             order = self.env["sale.order"].sudo().search(domain, limit=1)
             if not order:
                 vals = import_data._prepare_order_vals(
-                    partner, ship_partner, inv_partner, company, team, carrier, currency
+                    partner, ship_partner, inv_partner, company, team, carrier, currency, pricelist
                 )
                 order = self.env["sale.order"].sudo().create(vals)
                 import_data.hook_update_sale_order(order)
